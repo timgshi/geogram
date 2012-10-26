@@ -428,4 +428,9 @@ Small Device Styles
     font-size: 11px;
   }
 
+  path {
+  fill: #ccc;
+  stroke: #fff;
+}
+
 }
