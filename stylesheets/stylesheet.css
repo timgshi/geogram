@@ -54,6 +54,10 @@ a:focus {
 /*******************************************************************************
 Theme Styles
 *******************************************************************************/
+path {
+  fill: #ccc;
+  stroke: #fff;
+} 
 
 body {
   box-sizing: border-box;
@@ -427,10 +431,5 @@ Small Device Styles
     max-width: 480px;
     font-size: 11px;
   }
-
-  path {
-  fill: #ccc;
-  stroke: #fff;
-}
 
 }
