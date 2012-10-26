@@ -11,5 +11,7 @@ To Install
 Clone
 
 virtualenv --distribute venv 
+
 source venv/bin/activate
+
 pip install python-instagram
