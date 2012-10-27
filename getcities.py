@@ -14,7 +14,7 @@ cities = {'San Francisco' :
 		  					  'lng' : -118.245,
 		  					  'distance' : 5000}}
 
-MEDIA_COUNT = 1
+MEDIA_COUNT = 100
 
 all_images = {}
 
