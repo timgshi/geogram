@@ -46,6 +46,15 @@ d3.json("readme.json", function(collection) {
       .attr("d", d3.geo.path().projection(d3.geo.albers()));
 });
 
+d3.json("cityphotos.json", function(collection) {
+  d3.select("svg").selectAll("circle")
+      .data(collection.features)
+    .enter().append("circle")
+        .attr("cx", 90)
+        .attr("cy", 90)
+        .attr("r", 2);
+});
+
 </script>
 
 <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
