@@ -32,12 +32,15 @@ for cityName in cities:
 		image_dict['likes'] = ''
 		image_dict['comments'] = ''
 		image_dict['tags'] = []
+		image_dict['location'] = {}
 		try:
 			image_dict['image-thumb'] = image.images['thumbnail'].url
 			image_dict['image-large'] = image.images['standard_resolution'].url
 			image_dict['timestamp'] = image.created_time.isoformat()
 			image_dict['likes'] = len(image.likes)
 			image_dict['comments'] = len(image.comments)
+			image_dict['location'] = {'lat' : image.location.point.latitude,
+									  'lng' : image.location.point.longitude}
 			tags = []
 			for tag in image.tags:
 				tags.append(tag.name)

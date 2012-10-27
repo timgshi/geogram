@@ -50,7 +50,9 @@ d3.json("cityphotos.json", function(json) {
   d3.select("svg").selectAll("circle")
       .data(json.cities)
     .enter().append("circle")
-        .attr("cx", 50)
+        .attr("cx", function(d) {
+                      return d3.geo.path().projection
+                    })
         .attr("cy", 50)
         .attr("r", 5)
         .style("fill", "red");
