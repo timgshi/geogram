@@ -48,7 +48,7 @@ d3.json("readme.json", function(collection) {
 
 d3.json("cityphotos.json", function(collection) {
   d3.select("svg").selectAll("circle")
-      .data(collection.features)
+      .data(collection)
     .enter().append("circle")
         .attr("cx", 90)
         .attr("cy", 90)
