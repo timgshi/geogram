@@ -46,13 +46,15 @@ d3.json("readme.json", function(collection) {
       .attr("d", d3.geo.path().projection(d3.geo.albers()));
 });
 
-d3.json("cityphotos.json", function(collection) {
+d3.json("cityphotos.json", function(json) {
   d3.select("svg").selectAll("circle")
-      .data(collection)
+      .data(json.cities)
     .enter().append("circle")
-        .attr("cx", 90)
-        .attr("cy", 90)
-        .attr("r", 2);
+        .attr("cx", 50)
+        .attr("cy", 50)
+        .attr("r", 5)
+        .style("fill", "red");
+  console.log(json.cities)
 });
 
 </script>
