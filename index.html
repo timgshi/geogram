@@ -43,20 +43,46 @@ d3.json("readme.json", function(collection) {
   d3.select("svg").selectAll("path")
       .data(collection.features)
     .enter().append("path")
-      .attr("d", d3.geo.path().projection(d3.geo.albers()));
+      .attr("d", d3.geo.path().projection(d3.geo.albersUsa()));
 });
 
 d3.json("cityphotos.json", function(json) {
-  d3.select("svg").selectAll("circle")
-      .data(json.cities)
+  json.cities.forEach(function(city) {
+    d3.select("svg").selectAll("circle")
+      .data(city.media)
     .enter().append("circle")
         .attr("cx", function(d) {
-                      return d3.geo.path().projection
+                      var projection = d3.geo.albers()
+                      var coords = projection(d.location.lng, d.location.lat);
+                      var x = coords[0];
+                      var lat = d3.geo.albers([d.location.lng, d.location.lat])[0];
+                      console.log(d.location.lng);
+                      console.log(coords);
+                      return 50;
+                      // return 50;
                     })
-        .attr("cy", 50)
+        .attr("cy", function(d) {
+                      var lng = d3.geo.albers([d.location.lng, d.location.lat])[1];
+                      return 50;
+                      // return 50;
+                    })
         .attr("r", 5)
         .style("fill", "red");
-  console.log(json.cities)
+  });
+  // d3.select("svg").selectAll("circle")
+  //     .data(json.cities)
+  //   .enter().append("circle")
+  //       .attr("cx", function(d) {
+  //                     // return d3.geo.path().projection([d.location.lat, d.location.lng])[0];
+  //                     return 50;
+  //                   })
+  //       .attr("cy", function(d) {
+  //                     // return d3.geo.path().projection([d.location.lat, d.location.lng])[1];
+  //                     return 50;
+  //                   })
+  //       .attr("r", 5)
+  //       .style("fill", "red");
+  // console.log(json.cities)
 });
 
 </script>

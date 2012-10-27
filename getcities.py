@@ -14,7 +14,7 @@ cities = {'San Francisco' :
 		  					  'lng' : -118.245,
 		  					  'distance' : 5000}}
 
-MEDIA_COUNT = 100
+MEDIA_COUNT = 10
 
 all_images = {}
 all_cities = []
@@ -49,7 +49,7 @@ for cityName in cities:
 			pass
 		city_list.append(image_dict)
 	# all_images[city['name']] = city_list
-	all_cities.append({city['name'] : city_list})
+	all_cities.append({'media' : city_list, 'name' : cityName})
 print json.dumps(all_cities, sort_keys=True, indent=2)
 f = open('cityphotos.json', 'w')
 f.write(json.dumps({'cities': all_cities}))
