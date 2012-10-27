@@ -3,6 +3,8 @@ Slate Theme for Github Pages
 by Jason Costello, @jsncostello
 *******************************************************************************/
 
+
+
 @import url(pygment_trac.css);
 
 /*******************************************************************************
@@ -27,6 +29,12 @@ time, mark, audio, video {
   border: 0;
   font: inherit;
   vertical-align: baseline;
+}
+
+
+path {
+  fill: #ccc;
+  stroke: #fff;
 }
 
 /* HTML5 display-role reset for older browsers */
@@ -54,6 +62,10 @@ a:focus {
 /*******************************************************************************
 Theme Styles
 *******************************************************************************/
+path {
+  fill: #ccc;
+  stroke: #fff;
+} 
 
 body {
   box-sizing: border-box;
