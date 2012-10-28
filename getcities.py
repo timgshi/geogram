@@ -7,6 +7,7 @@ CLIENT_SECRET = '5084aa9081e04ad097d4510e1e4e77d9'
 MEDIA_COUNT = 10
 MAX_CITIES = 10
 counter = 0
+
 # cities = {'San Francisco' :
 # 							{'name' : 'San Francisco',
 # 							 'lat' : 37.7831,
@@ -33,11 +34,11 @@ for row in reader:
 	counter+=1
 	if counter == MAX_CITIES:
 		break
-
 print cities
 citiesDB.close()
 
-all_images = {}
+all_cities = []
+
 api = InstagramAPI(client_id=CLIENT_ID, client_secret=CLIENT_SECRET)
 for cityName in cities:
 	city = cities[cityName]
@@ -51,12 +52,15 @@ for cityName in cities:
 		image_dict['likes'] = ''
 		image_dict['comments'] = ''
 		image_dict['tags'] = []
+		image_dict['location'] = {}
 		try:
 			image_dict['image-thumb'] = image.images['thumbnail'].url
 			image_dict['image-large'] = image.images['standard_resolution'].url
 			image_dict['timestamp'] = image.created_time.isoformat()
 			image_dict['likes'] = len(image.likes)
 			image_dict['comments'] = len(image.comments)
+			image_dict['location'] = {'lat' : image.location.point.latitude,
+									  'lng' : image.location.point.longitude}
 			tags = []
 			for tag in image.tags:
 				tags.append(tag.name)
@@ -64,9 +68,9 @@ for cityName in cities:
 		except AttributeError:
 			pass
 		city_list.append(image_dict)
-	all_images[city['name']] = city_list
-
-print json.dumps(all_images, sort_keys=True, indent=2)
+	# all_images[city['name']] = city_list
+	all_cities.append({'media' : city_list, 'name' : cityName})
+print json.dumps(all_cities, sort_keys=True, indent=2)
 f = open('cityphotos.json', 'w')
-f.write(json.dumps(all_images))
+f.write(json.dumps({'cities': all_cities}))
 f.close()
