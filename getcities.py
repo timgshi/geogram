@@ -1,22 +1,42 @@
 from instagram.client import InstagramAPI
 import json
+import csv
 
 CLIENT_ID = '5d112de8521e4a658a350b17c75b85bd'
 CLIENT_SECRET = '5084aa9081e04ad097d4510e1e4e77d9'
-
-cities = {'San Francisco' :
-							{'name' : 'San Francisco',
-							 'lat' : 37.7831,
-							 'lng' : -122.420,
-							 'distance' : 5000},
-		  'Los Angeles' : 	{'name' : 'Los Angeles',
-		  					  'lat' : 34.102,
-		  					  'lng' : -118.245,
-		  					  'distance' : 5000}}
-
 MEDIA_COUNT = 10
+MAX_CITIES = 10
+counter = 0
 
-all_images = {}
+# cities = {'San Francisco' :
+# 							{'name' : 'San Francisco',
+# 							 'lat' : 37.7831,
+# 							 'lng' : -122.420,
+# 							 'distance' : 5000},
+# 		  'Los Angeles' : 	{'name' : 'Los Angeles',
+# 		  					  'lat' : 34.102,
+# 		  					  'lng' : -118.245,
+# 		  					  'distance' : 5000}}
+
+cities = {}
+citiesDB = open('cities.csv', "rb")
+reader = csv.reader(citiesDB)
+
+for row in reader:
+	city = {}
+	city['name'] = row[0]
+	city['lat'] = float(row[1])
+	city['lng'] = float(row[2])
+	city['distance'] = 5000
+	cities[row[0]] = city
+
+	#temp test value to limit number of cities from csv we process
+	counter+=1
+	if counter == MAX_CITIES:
+		break
+print cities
+citiesDB.close()
+
 all_cities = []
 all_media = []
 
