@@ -46,43 +46,83 @@ d3.json("readme.json", function(collection) {
       .attr("d", d3.geo.path().projection(d3.geo.albersUsa()));
 });
 
+
+// d3.json("cityphotos.json", function(json) {
+//     // var g = d3.select("svg").selectAll("g").data(json.cities).enter()
+//     //   .append("g");
+
+//     //   g.selectAll("cicle")
+//     //     .data(function(d) { console.log(d); return d.media})
+//     //       .enter()
+//     //       .append("circle")
+
+//       d3.select("svg").selectAll("circle")
+//           .data(json.cities).enter().append("circle")
+//               .attr("cx", function(d) {
+//                             //console.log(d);
+//                             var projection = d3.geo.albers()
+//                             var coords = projection([d.location.lng, d.location.lat]);
+//                              return coords[0];
+//                           })
+//         .attr("cy", function(d) {
+//                       var projection = d3.geo.albers()
+//                       var coords = projection([d.location.lng, d.location.lat]);
+//                       if (d.location.lng == -118.209182739) {
+//                         console.log("Los Angeles printed");
+//                       }
+//                       return coords[1];
+//                     })
+//         .attr("r", 2)
+//         .style("fill", "red");
+// });
+
 d3.json("cityphotos.json", function(json) {
-  json.cities.forEach(function(city) {
-    d3.select("svg").selectAll("circle")
-      .data(city.media)
-    .enter().append("circle")
+  var svg = d3.select("svg");
+  var g = svg.selectAll("g").data(json.cities)
+              .enter().append("g");
+  g.selectAll("rect").data(function(d) { return d.location; })
+      .enter().append("rect")
+        .attr("x", function(d) {
+                      var projection = d3.geo.albers()
+                      var coords = projection([d.lng, d.lat]);
+                       return coords[0];
+                    })
+        .attr("y", function(d) {
+                      var projection = d3.geo.albers()
+                      var coords = projection([d.lng, d.lat]);
+                      return coords[1];
+                    })
+        .attr("width", 4)
+        .attr("height", 4)
+        .style("fill", "green");
+
+  g.selectAll("circle").data(function(d) { return d.media; })
+      .enter().append("circle")
         .attr("cx", function(d) {
                       var projection = d3.geo.albers()
-                      var coords = projection(d.location.lng, d.location.lat);
-                      var x = coords[0];
-                      var lat = d3.geo.albers([d.location.lng, d.location.lat])[0];
-                      console.log(d.location.lng);
-                      console.log(coords);
-                      return 50;
-                      // return 50;
+                      var coords = projection([d.location.lng, d.location.lat]);
+                       return coords[0];
                     })
         .attr("cy", function(d) {
-                      var lng = d3.geo.albers([d.location.lng, d.location.lat])[1];
-                      return 50;
-                      // return 50;
+                      var projection = d3.geo.albers()
+                      var coords = projection([d.location.lng, d.location.lat]);
+                      return coords[1];
                     })
-        .attr("r", 5)
-        .style("fill", "red");
-  });
-  // d3.select("svg").selectAll("circle")
-  //     .data(json.cities)
-  //   .enter().append("circle")
-  //       .attr("cx", function(d) {
-  //                     // return d3.geo.path().projection([d.location.lat, d.location.lng])[0];
-  //                     return 50;
-  //                   })
-  //       .attr("cy", function(d) {
-  //                     // return d3.geo.path().projection([d.location.lat, d.location.lng])[1];
-  //                     return 50;
-  //                   })
-  //       .attr("r", 5)
-  //       .style("fill", "red");
-  // console.log(json.cities)
+        .attr("r", 2)
+        .style("fill", "red")
+        .on("click", click);
+
+  function click (d) {
+    var projection = d3.geo.albers()
+    var coords = projection([d.location.lng, d.location.lat]);
+    svg.append("image")
+        .attr("xlink:href", d.image_thumb)
+        .attr("width", 100)
+        .attr("height", 100)
+        .attr("x", coords[0])
+        .attr("y", coords[1]);
+  }
+
 });
 
 </script>
