@@ -114,7 +114,7 @@ function mapClick (d) {
 
   map.transition()
       .duration(1000)
-      .attr("transform", "scale(" + k + ")translate(" + x + "," + y + ")")
+      .attr("transform", "scale(" + k + ")translate(" + (x + 2*margin.left + 50) + "," + (y + margin.bottom) + ")")
       .style("stroke-width", 1.5 / k + "px");
 }
 
