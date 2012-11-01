@@ -16,6 +16,16 @@
       .bar {
         fill: steelblue;
       }
+
+      #states {
+        fill: #aaa;
+        stroke: #fff;
+        stroke-width: 1.5px;
+      }
+
+      #states .active {
+        fill: steelblue;
+      }
     </style>
 
   </head>
@@ -50,7 +60,8 @@ var margin = {top: 10, right: 10, bottom: 100, left: 40},
     margin2 = {top: 550, right: 10, bottom: 20, left: 40},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - margin.bottom,
-    height2 = 500 - margin2.top - margin2.bottom;
+    height2 = 500 - margin2.top - margin2.bottom,
+    centered;
 
 var x = d3.scale.ordinal()
     .rangeRoundBands([0, width], .1);
@@ -60,7 +71,8 @@ var y = d3.scale.linear()
 
 var svg = d3.select("svg");
 var map = svg.append("g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+          .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+          .attr("id", "states");
 var chart = svg.append("g")
             .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");;
 
@@ -75,8 +87,36 @@ d3.json("readme.json", function(collection) {
   map.selectAll("path")
       .data(collection.features)
     .enter().append("path")
-      .attr("d", d3.geo.path().projection(d3.geo.albersUsa()));
+      .attr("d", d3.geo.path().projection(d3.geo.albersUsa()))
+      .on("click", mapClick);
 });
+
+var path = d3.geo.path()
+    .projection(d3.geo.albersUsa());
+
+function mapClick (d) {
+  var x = 0,
+      y = 0,
+      k = 1;
+
+  if (d && centered !== d) {
+    var centroid = path.centroid(d);
+    x = -centroid[0];
+    y = -centroid[1];
+    k = 4;
+    centered = d;
+  } else {
+    centered = null;
+  }
+
+  map.selectAll("path")
+      .classed("active", centered && function(d) { return d === centered; });
+
+  map.transition()
+      .duration(1000)
+      .attr("transform", "scale(" + k + ")translate(" + x + "," + y + ")")
+      .style("stroke-width", 1.5 / k + "px");
+}
 
 d3.json("cityphotos.json", function(json) {
   console.log(json);
