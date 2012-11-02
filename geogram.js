@@ -77,20 +77,16 @@ function click(d) {
 }
 
 d3.json("cityphotos.json", function(json) {
-  console.log(json);
-  // var mapsvg = d3.select("mapsvg");
   var g = map.selectAll("g").data(json.cities)
               .enter().append("g");
   g.selectAll("rect").data(function(d) { return d.location; })
       .enter().append("rect")
         .attr("x", function(d) {
-                      //var projection = path.projection();
                       var coords = projection([d.lng, d.lat]);
                       console.log(coords[0])
                        return coords[0];
                     })
         .attr("y", function(d) {
-                      //var projection = projection();
                       var coords = projection([d.lng, d.lat]);
                       console.log(coords[0])
                       return coords[1];

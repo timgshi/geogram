@@ -1,23 +1,7 @@
 
-{"children": [
-{
- 
- "name": "Los Angelas",
- "children": [
-    {"name": "cluster"},  
-    {"name": "graph"},
-    {"name": "optimization"}
-   ]
-},
-
-{ 
- "name": "New York",
- "children": [
-    {"name": "cluster"},  
-    {"name": "graph"},
-    {"name": "optimization"}
-   ]
-}
-
-
-]}
+{ "children" : [ { "location" : [ { "lat" : 40.664299999999997,
+              "lng" : -73.938500000000005
+            } ],
+        "children" : [ { "name" : "Halloween"},  { "name" : "ThanksGiving"} ],
+        "name" : "New York"
+      } ] }
