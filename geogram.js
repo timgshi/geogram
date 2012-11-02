@@ -1,8 +1,8 @@
 var width = 960,
     height = 500,
 
-    margin2 = {top: 550, right: 10, bottom: 20, left: 40},
-    height2 = 500 - margin2.top - margin2.bottom,
+    margin2 = {top: 30, right: 10, bottom: 20, left: 0},
+    height2 = margin2.top - margin2.bottom,
     centered;
 
 var x = d3.scale.ordinal()
@@ -18,17 +18,29 @@ var projection = d3.geo.albersUsa()
 var path = d3.geo.path()
     .projection(projection);
 
-var svg = d3.select("svg")
+var mapsvg = d3.select("#map_svg")
     .attr("width", width)
     .attr("height", height);
 
-var map = svg.append("g")
+var chartsvg = d3.select("#chart_svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var map = mapsvg.append("g")
     .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
   .append("g")
     .attr("id", "states");
 
-var chart = svg.append("g")
-  .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");;    
+var chart = chartsvg.append("g")
+  .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+
+var xAxis = d3.svg.axis()
+    .scale(x)
+    .orient("bottom");
+
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .orient("left");  
 
 d3.json("readme.json", function(collection) {
   map.selectAll("path")
@@ -64,7 +76,7 @@ function click(d) {
 
 d3.json("cityphotos.json", function(json) {
   console.log(json);
-  // var svg = d3.select("svg");
+  // var mapsvg = d3.select("mapsvg");
   var g = map.selectAll("g").data(json.cities)
               .enter().append("g");
   g.selectAll("rect").data(function(d) { return d.location; })
@@ -104,7 +116,7 @@ d3.json("cityphotos.json", function(json) {
   function mouseover(d) {
     var projection = d3.geo.albers()
     var coords = projection([d.location.lng, d.location.lat]);
-    svg.append("image")
+    mapsvg.append("image")
         .attr("xlink:href", d.image_thumb)
         .attr("width", 100)
         .attr("height", 100)
@@ -113,12 +125,12 @@ d3.json("cityphotos.json", function(json) {
   }
 
   function mouseout (d) {
-    svg.select("image").remove();
+    mapsvg.select("image").remove();
   }
 
   function citymouseover (d) {
     console.log(d);
-    svg.select("#"+d.name).style("fill", "red");
+    mapsvg.select("#"+d.name).style("fill", "red");
   }
 
   var likes = [];
@@ -128,14 +140,38 @@ d3.json("cityphotos.json", function(json) {
       likeCount += media.likes;
     });
     var name = city.name;
-    // likes.push({key:'city.name', value:likeCount});
-    var dict = {'name':city.name, 'likes':likeCount};
+    var dict = {'name':city.name, 'likes':likeCount, 'location':city.location};
     likes.push(dict);
   });
   console.log(likes);
 
+  // sort by increasing longitude
+  likes.sort(function (a, b) {
+    var lngA = a.location[0].lng;
+    var lngB = b.location[0].lng;
+    return lngA < lngB ? -1 : lngA > lngB ? 1 : 0;
+  });
+
   x.domain(json.cities.map(function(d) { return d.name; }));
   y.domain([0, d3.max(likes, function(d) { return d.likes; })]);
+
+  chart.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + (height2 + 40) + ")")
+        .call(xAxis)
+        .selectAll("text").attr("transform", function(d) {
+          return "rotate(-90) translate(-" + (this.getBBox().width/2 + 10) + ", -" +
+              (this.getBBox().height/2 + 8) + ")";});
+
+  chart.append("g")
+      .attr("class", "y axis")
+      .call(yAxis)
+    .append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", ".71em")
+      .style("text-anchor", "end")
+      .text("Likes");
 
   chart.selectAll(".bar")
         .data(likes)
@@ -146,5 +182,4 @@ d3.json("cityphotos.json", function(json) {
         .attr("width", x.rangeBand())
         .attr("y", function(d, i) { return height2+40 - d.likes; })
         .attr("height", function(d, i) { return d.likes; });
-
 });

@@ -25,6 +25,13 @@
       #states .active {
         fill: steelblue;
       }
+      
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
     </style>
 
   </head>
@@ -50,7 +57,8 @@
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
 
-        <svg width="960" height="1500"></svg>
+        <svg id="map_svg" width="960" height="500"></svg>
+        <svg id="chart_svg" width="960" height="500"></svg>
         <script src="geogram.js"></script>
 
     </div>
