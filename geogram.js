@@ -167,7 +167,7 @@ d3.json("cityphotos.json", function(json) {
   console.log(indices);
   color.domain(indices);
 
-  x.domain(json.cities.map(function(d) { return d.name; }));
+  x.domain(likes.map(function(d) { return d.name; }));
   console.log(y.domain([0, d3.max(likes, function(d) { return d.likes; })]));
 
   var city = chart.selectAll(".city")
