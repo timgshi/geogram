@@ -226,6 +226,6 @@ d3.json("cityphotos.json", function(json) {
                 .text("Total Likes per City")
                 .attr("transform", function(d) {
                     return "translate(" + (width/2 - this.getBBox().width/2 - 50) + ", -" +
-                        (this.getBBox().height/2 + 8) + ")";});
+                        (this.getBBox().height/2 + 5) + ")";});
 
 });
