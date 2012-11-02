@@ -139,17 +139,18 @@ d3.json("cityphotos.json", function(json) {
   var maxLikes = 0;
   json.cities.forEach(function (city) {
     var likeCount = 0;
+    var y0 = 0;
+    var individualLikes = [];
     city.media.forEach(function (media) {
+      individualLikes.push({y0: y0, y1: y0 += media.likes, image: media.image_thumb});
       likeCount += media.likes;
     });
     var name = city.name;
     maxLikes = Math.max(maxLikes, likeCount);
-    console.log("like count: " + likeCount);
-    var dict = {'name':city.name, 'likes':likeCount, 'location':city.location};
+    console.log(city.name + " like count: " + likeCount);
+    var dict = {'name':city.name, 'likes':likeCount, 'location':city.location, 'individualLikes':individualLikes};
     likes.push(dict);
   });
-  console.log(maxLikes);
-  // console.log(likes);
 
   // sort by increasing longitude
   likes.sort(function (a, b) {
@@ -158,8 +159,24 @@ d3.json("cityphotos.json", function(json) {
     return lngA < lngB ? -1 : lngA > lngB ? 1 : 0;
   });
 
+  var color = d3.scale.category20();
+  var indices = new Array(25);
+  for (var i = 0; i < 25; i++) {
+    indices[i] = i;
+  };
+  console.log(indices);
+  color.domain(indices);
+
   x.domain(json.cities.map(function(d) { return d.name; }));
   console.log(y.domain([0, d3.max(likes, function(d) { return d.likes; })]));
+
+  var city = chart.selectAll(".city")
+                    .data(likes)
+                    .enter().append("g")
+                    .attr("class", "g")
+                    .attr("transform", function(d) { console.log(d); return "translate(" + x(d.name) + ",0)"; })
+                    .attr("fill", "Clear");
+
 
   chart.append("g")
         .attr("class", "x axis")
@@ -179,13 +196,40 @@ d3.json("cityphotos.json", function(json) {
       .style("text-anchor", "end")
       .text("Likes");
 
-  chart.selectAll(".bar")
-        .data(likes)
+  city.selectAll(".bar")
+        .data(function(d) { return d.individualLikes; })
       .enter().append("rect")
-        .attr("id", function (d) { return d.name })
+        // .attr("id", function (d) { return d.name })
         .attr("class", "bar")
-        .attr("x", function(d, i) { return x(d.name); })
+        // .attr("x", function(d, i) { return x(d.name); })
         .attr("width", x.rangeBand())
-        .attr("y", function(d, i) { return y(d.likes) + 0; })
-        .attr("height", function(d, i) { console.log(d.likes); return height2 - y(d.likes) + margin2.top; });
+        .attr("y", function(d, i) { return y(d.y1) + 0; })
+        .attr("height", function(d, i) { return y(d.y0) - y(d.y1); })
+        .style("fill", function(d, i) { return color(i)})
+        .on("mouseover", barOver)
+        .on("mouseout", barOut);
+
+  function barOver (d) {
+    this.style.opacity= 0.2;
+    var coords = d3.mouse(this.parentNode.parentNode);
+    chart.append("image")
+        .attr("xlink:href", d.image)
+        .attr("width", 100)
+        .attr("height", 100)
+        .attr("x", coords[0] + 5)
+        .attr("y", coords[1] + 5);
+  }
+  function barOut (d) {
+    this.style.opacity= 1.0;
+    chart.select("image").remove();
+  }
+
+  var title = chart.append("g")
+                .append("text")
+                .attr("class", "title")
+                .text("Total Likes per City")
+                .attr("transform", function(d) {
+                    return "translate(" + (width/2 - this.getBBox().width/2 - 50) + ", -" +
+                        (this.getBBox().height/2 + 8) + ")";});
+
 });
