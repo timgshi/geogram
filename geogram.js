@@ -1,7 +1,7 @@
-var margin = {top: 10, right: 10, bottom: 100, left: 40},
+var width = 960,
+    height = 500,
+
     margin2 = {top: 550, right: 10, bottom: 20, left: 40},
-    width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom,
     height2 = 500 - margin2.top - margin2.bottom,
     centered;
 
@@ -11,32 +11,34 @@ var x = d3.scale.ordinal()
 var y = d3.scale.linear()
     .range([height2, 0]);
 
-var svg = d3.select("svg");
-var map = svg.append("g")
-          .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
-          .attr("id", "states");
-var chart = svg.append("g")
-            .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");;
+var projection = d3.geo.albersUsa()
+    .scale(width)
+    .translate([0, 0]);
 
-// d3.json("readme.json", function(collection) {
-//   d3.select("svg").selectAll("path")
-//       .data(collection.features)
-//     .enter().append("path")
-//       .attr("d", d3.geo.path().projection(d3.geo.albersUsa()));
-// });
+var path = d3.geo.path()
+    .projection(projection);
+
+var svg = d3.select("svg")
+    .attr("width", width)
+    .attr("height", height);
+
+var map = svg.append("g")
+    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")")
+  .append("g")
+    .attr("id", "states");
+
+var chart = svg.append("g")
+  .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");;    
 
 d3.json("readme.json", function(collection) {
   map.selectAll("path")
       .data(collection.features)
     .enter().append("path")
-      .attr("d", d3.geo.path().projection(d3.geo.albersUsa()))
-      .on("click", mapClick);
+      .attr("d", path)
+      .on("click", click);
 });
 
-var path = d3.geo.path()
-    .projection(d3.geo.albersUsa());
-
-function mapClick (d) {
+function click(d) {
   var x = 0,
       y = 0,
       k = 1;
@@ -56,7 +58,7 @@ function mapClick (d) {
 
   map.transition()
       .duration(1000)
-      .attr("transform", "scale(" + k + ")translate(" + (x + 2*margin.left + 50) + "," + (y + margin.bottom) + ")")
+      .attr("transform", "scale(" + k + ")translate(" + x + "," + y + ")")
       .style("stroke-width", 1.5 / k + "px");
 }
 
@@ -68,13 +70,15 @@ d3.json("cityphotos.json", function(json) {
   g.selectAll("rect").data(function(d) { return d.location; })
       .enter().append("rect")
         .attr("x", function(d) {
-                      var projection = d3.geo.albers()
+                      //var projection = path.projection();
                       var coords = projection([d.lng, d.lat]);
+                      console.log(coords[0])
                        return coords[0];
                     })
         .attr("y", function(d) {
-                      var projection = d3.geo.albers()
+                      //var projection = projection();
                       var coords = projection([d.lng, d.lat]);
+                      console.log(coords[0])
                       return coords[1];
                     })
         .attr("width", 4)
@@ -85,12 +89,10 @@ d3.json("cityphotos.json", function(json) {
   g.selectAll("circle").data(function(d) { return d.media; })
       .enter().append("circle")
         .attr("cx", function(d) {
-                      var projection = d3.geo.albers()
                       var coords = projection([d.location.lng, d.location.lat]);
                        return coords[0];
                     })
         .attr("cy", function(d) {
-                      var projection = d3.geo.albers()
                       var coords = projection([d.location.lng, d.location.lat]);
                       return coords[1];
                     })
@@ -119,8 +121,6 @@ d3.json("cityphotos.json", function(json) {
     svg.select("#"+d.name).style("fill", "red");
   }
 
-
-
   var likes = [];
   json.cities.forEach(function (city) {
     var likeCount = 0;
@@ -146,4 +146,5 @@ d3.json("cityphotos.json", function(json) {
         .attr("width", x.rangeBand())
         .attr("y", function(d, i) { return height2+40 - d.likes; })
         .attr("height", function(d, i) { return d.likes; });
+
 });
