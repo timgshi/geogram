@@ -1,7 +1,12 @@
 
-{ "children" : [ { "location" : [ { "lat" : 40.664299999999997,
-              "lng" : -73.938500000000005
-            } ],
-        "children" : [ { "name" : "Halloween"},  { "name" : "ThanksGiving"} ],
-        "name" : "New York"
-      } ] }
+{ 
+
+  "cities" : [ { 
+
+              "location" : [ { "lat" : 40.664299999999997, "lng" : -73.938500000000005} ],
+
+              "children" : [ { "name" : "Halloween"},  { "name" : "ThanksGiving"} ],
+              "name" : "New York"
+            } ]
+
+}
