@@ -5,8 +5,10 @@
 
               "location" : [ { "lat" : 40.664299999999997, "lng" : -73.938500000000005} ],
 
-              "children" : [ { "name" : "Halloween"},  { "name" : "ThanksGiving"} ],
+              "children" : [ { "name" : "Halloween", "data": "1"},  { "name" : "ThanksGiving", "data":"1"} ],
               "name" : "New York"
-            } ]
+            }
+
+            ]
 
 }
