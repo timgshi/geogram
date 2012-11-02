@@ -63,8 +63,6 @@ function click(d) {
 }
 
 d3.json("cityphotos.json", function(json) {
-  console.log(json);
-  // var svg = d3.select("svg");
   var g = map.selectAll("g").data(json.cities)
               .enter().append("g");
   g.selectAll("rect").data(function(d) { return d.location; })
