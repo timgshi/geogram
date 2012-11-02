@@ -1,15 +1,16 @@
 var width = 960,
     height = 500,
 
-    margin2 = {top: 30, right: 10, bottom: 20, left: 0},
-    height2 = margin2.top - margin2.bottom,
+    chartHeight = 300,
+    margin2 = {top: 40, right: 20, bottom: 70, left: 60},
+    height2 = chartHeight - (margin2.top + margin2.bottom),
     centered;
 
 var x = d3.scale.ordinal()
-    .rangeRoundBands([0, width], .1);
+    .rangeRoundBands([0, width - (margin2.left + margin2.right)], .1);
 
 var y = d3.scale.linear()
-    .range([height2, 0]);
+    .range([height2 + 40, 0]);
 
 var projection = d3.geo.albersUsa()
     .scale(width)
@@ -32,7 +33,8 @@ var map = mapsvg.append("g")
     .attr("id", "states");
 
 var chart = chartsvg.append("g")
-  .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+  .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")")
+  .attr("width", width - (margin2.left + margin2.right));
 
 var xAxis = d3.svg.axis()
     .scale(x)
@@ -134,16 +136,20 @@ d3.json("cityphotos.json", function(json) {
   }
 
   var likes = [];
+  var maxLikes = 0;
   json.cities.forEach(function (city) {
     var likeCount = 0;
     city.media.forEach(function (media) {
       likeCount += media.likes;
     });
     var name = city.name;
+    maxLikes = Math.max(maxLikes, likeCount);
+    console.log("like count: " + likeCount);
     var dict = {'name':city.name, 'likes':likeCount, 'location':city.location};
     likes.push(dict);
   });
-  console.log(likes);
+  console.log(maxLikes);
+  // console.log(likes);
 
   // sort by increasing longitude
   likes.sort(function (a, b) {
@@ -153,7 +159,7 @@ d3.json("cityphotos.json", function(json) {
   });
 
   x.domain(json.cities.map(function(d) { return d.name; }));
-  y.domain([0, d3.max(likes, function(d) { return d.likes; })]);
+  console.log(y.domain([0, d3.max(likes, function(d) { return d.likes; })]));
 
   chart.append("g")
         .attr("class", "x axis")
@@ -167,7 +173,7 @@ d3.json("cityphotos.json", function(json) {
       .attr("class", "y axis")
       .call(yAxis)
     .append("text")
-      .attr("transform", "rotate(-90)")
+      .attr("transform", "rotate(-90) translate(-20, -60)")
       .attr("y", 6)
       .attr("dy", ".71em")
       .style("text-anchor", "end")
@@ -180,6 +186,6 @@ d3.json("cityphotos.json", function(json) {
         .attr("class", "bar")
         .attr("x", function(d, i) { return x(d.name); })
         .attr("width", x.rangeBand())
-        .attr("y", function(d, i) { return height2+40 - d.likes; })
-        .attr("height", function(d, i) { return d.likes; });
+        .attr("y", function(d, i) { return y(d.likes) + 0; })
+        .attr("height", function(d, i) { console.log(d.likes); return height2 - y(d.likes) + margin2.top; });
 });
