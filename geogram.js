@@ -84,7 +84,6 @@ d3.json("cityphotos.json", function(json) {
   var g = map.selectAll("g").data(json.cities)
               .enter().append("g");
   g.forEach(function(d) {
-    console.log(d);
     d.forEach(function(obj) {
       console.log(obj);
     });
@@ -111,30 +110,33 @@ d3.json("cityphotos.json", function(json) {
         .attr("width", 4)
         .attr("height", 4)
         .style("fill", "green")
-        .on("mouseover", citymouseover);
-
-  g.selectAll("circle").data(function(d) { return d.media; })
-      .enter().append("circle")
-        .attr("cx", function(d) {
-                      var coords = projection([d.location.lng, d.location.lat]);
-                       return coords[0];
-                    })
-        .attr("cy", function(d) {
-                      var coords = projection([d.location.lng, d.location.lat]);
-                      return coords[1];
-                    })
-        .attr("r", 2)
-        .style("fill", "red")
-        .on("mouseover", mouseover)
+        .on("mouseover", citymouseover)
         .on("mouseout", mouseout);
+
+  // g.selectAll("circle").data(function(d) { return d.media; })
+  //     .enter().append("circle")
+  //       .attr("cx", function(d) {
+  //                     var coords = projection([d.location.lng, d.location.lat]);
+
+  //                      return coords[0];
+  //                   })
+  //       .attr("cy", function(d) {
+  //                     var coords = projection([d.location.lng, d.location.lat]);
+  //                     return coords[1];
+  //                   })
+  //       .attr("r", 2)
+  //       .style("fill", "red")
+  //       .on("mouseover", mouseover)
+  //       .on("mouseout", mouseout);
 
   function mouseover(d) {
     var projection = d3.geo.albers()
     var coords = projection([d.location.lng, d.location.lat]);
+    console.log(coords);
     mapsvg.append("image")
         .attr("xlink:href", d.image_thumb)
-        .attr("width", 100)
-        .attr("height", 100)
+        .attr("width", 50)
+        .attr("height", 50)
         .attr("x", coords[0])
         .attr("y", coords[1]);
   }
@@ -143,35 +145,68 @@ d3.json("cityphotos.json", function(json) {
     mapsvg.select("image").remove();
   }
 
+
+  function citymouseout(d) {
+    var city = cities[d.i];
+    city.media.forEach(function(media) {
+      mapsvg.select("image").remove();
+    })
+
+  }
+
    function citymouseover (d) {
     console.log(d);
     console.log(d.i);
     var city = cities[d.i];
     console.log(city);
+
     var media_count = city.media.length;
     console.log(media_count);
     var offset_angle = (2*Math.PI)/media_count;
+    console.log(offset_angle);
     var counter = 0;
 
     function position(city, media, counter) {
         var length = 8;
-        var city = projection([city.location[0].lng, city.location[0].lat]); 
-        console.log("city: "+city);
+        var projection = d3.geo.albers();
+        var city_coord = projection([city.location[0].lng, city.location[0].lat]); 
+        console.log("city: "+city_coord);
+        console.log("city: " + city.name);
+     
+        console.log("offset_angle" + offset_angle);
         var x = length * Math.sin(offset_angle*counter);
         var y = length * Math.cos(offset_angle*counter);
-        var coords = [city[0] + x, city[1] + y];
+        console.log(counter);
+        var coords = [city_coord[0] + x, city_coord[1] + y];
+        console.log(coords);
         return coords;
     }
+    console.log(city.media.length);
 
     city.media.forEach(function(media) {
       counter += 1;
       var coords = position(city, media, counter);
-      mapsvg.append("image")
-        .attr("xlink:href", d.image_thumb)
-        .attr("width", 100)
-        .attr("height", 100)
-        .attr("x", coords[0])
-        .attr("y", coords[1]);
+      console.log(media);
+      console.log(coords);
+     
+
+      // mapsvg.append("image")
+      //   .attr("xlink:href", media.image_thumb)
+      //   .attr("width", 50)
+      //   .attr("height", 50)
+      //   .attr("x", coords[0])
+      //   .attr("y", coords[1]);
+
+//here coords should be updated for the new circle. verify in line 208 that coords is correct. 
+      mapsvg
+        .append("circle")
+        .attr("cx", coords[0]+counter)
+        .attr("cy", coords[1]+counter)
+        .attr("r", 1)
+        .style("fill", "green");
+
+      console.log("coordinates of projected image: " + coords);
+      console.log(mapsvg.selectAll("circle"));
     })
   }
 
@@ -187,7 +222,6 @@ d3.json("cityphotos.json", function(json) {
     });
     var name = city.name;
     maxLikes = Math.max(maxLikes, likeCount);
-    console.log(city.name + " like count: " + likeCount);
     var dict = {'name':city.name, 'likes':likeCount, 'location':city.location, 'individualLikes':individualLikes};
     likes.push(dict);
   });
@@ -204,17 +238,16 @@ d3.json("cityphotos.json", function(json) {
   for (var i = 0; i < 25; i++) {
     indices[i] = i;
   };
-  console.log(indices);
-  color.domain(indices);
+ 
 
   x.domain(likes.map(function(d) { return d.name; }));
-  console.log(y.domain([0, d3.max(likes, function(d) { return d.likes; })]));
+  //console.log(y.domain([0, d3.max(likes, function(d) { return d.likes; })]));
 
   var city = chart.selectAll(".city")
                     .data(likes)
                     .enter().append("g")
                     .attr("class", "g")
-                    .attr("transform", function(d) { console.log(d); return "translate(" + x(d.name) + ",0)"; })
+                    .attr("transform", function(d) { return "translate(" + x(d.name) + ",0)"; })
                     .attr("fill", "Clear");
 
 
