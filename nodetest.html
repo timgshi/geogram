@@ -71,7 +71,11 @@ function update() {
 
   // Update node
   node = vis.selectAll("circle.node")
-      .data(nodes, function(d) { console.log(d.name); return d.name; })
+      .data(nodes, function(d, i) { 
+        console.log(d.name);
+        d.x =  i * 5 + 50;
+        d.y = i * 5 + 50;
+        return d.name; })
       .style("fill", color);
 
   // Enter any new nodes.

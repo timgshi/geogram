@@ -42,7 +42,11 @@ var xAxis = d3.svg.axis()
 
 var yAxis = d3.svg.axis()
     .scale(y)
-    .orient("left");  
+    .orient("left");
+
+var likesDict = {};
+
+var cities = [];
 
 d3.json("readme.json", function(collection) {
   map.selectAll("path")
@@ -79,9 +83,22 @@ function click(d) {
 d3.json("cityphotos.json", function(json) {
   var g = map.selectAll("g").data(json.cities)
               .enter().append("g");
-  g.selectAll("rect").data(function(d) { return d.location; })
+  g.forEach(function(d) {
+    console.log(d);
+    d.forEach(function(obj) {
+      console.log(obj);
+    });
+  });
+  json.cities.forEach(function(city) {
+    cities.push(city);
+  });
+  console.log(cities);
+  var cityCount = 0;
+  g.selectAll("rect").data(function(d, i) { d.location.i = i; return d.location; })
       .enter().append("rect")
-        .attr("x", function(d) {
+        .attr("x", function(d, i) {
+                      d.i = cityCount;
+                      cityCount++;
                       var coords = projection([d.lng, d.lat]);
                       console.log(coords[0])
                        return coords[0];
@@ -126,9 +143,36 @@ d3.json("cityphotos.json", function(json) {
     mapsvg.select("image").remove();
   }
 
-  function citymouseover (d) {
+   function citymouseover (d) {
     console.log(d);
-    mapsvg.select("#"+d.name).style("fill", "red");
+    console.log(d.i);
+    var city = cities[d.i];
+    console.log(city);
+    var media_count = city.media.length;
+    console.log(media_count);
+    var offset_angle = (2*Math.PI)/media_count;
+    var counter = 0;
+
+    function position(city, media, counter) {
+        var length = 8;
+        var city = projection([city.location[0].lng, city.location[0].lat]); 
+        console.log("city: "+city);
+        var x = length * Math.sin(offset_angle*counter);
+        var y = length * Math.cos(offset_angle*counter);
+        var coords = [city[0] + x, city[1] + y];
+        return coords;
+    }
+
+    city.media.forEach(function(media) {
+      counter += 1;
+      var coords = position(city, media, counter);
+      mapsvg.append("image")
+        .attr("xlink:href", d.image_thumb)
+        .attr("width", 100)
+        .attr("height", 100)
+        .attr("x", coords[0])
+        .attr("y", coords[1]);
+    })
   }
 
   var likes = [];
