@@ -72,7 +72,7 @@ body {
   color:#373737;
   background: #212121;
   font-size: 16px;
-  font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;
+  font-family: 'Proxima Nova', Calibri, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
@@ -380,7 +380,19 @@ Full-Width Styles
 
 #main_content {
   padding-top: 40px;
+
+ 
 }
+
+ #legend {
+    display: block;
+    width: 149px;
+    height: 141px;
+    float: left;
+    margin-left: 20px;
+    margin-top: 50px;
+    background: url(../images/legend.png) no-repeat top left;
+  }
 
 #footer_wrap {
   background: #212121;
