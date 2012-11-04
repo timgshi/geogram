@@ -80,38 +80,47 @@ function click(d) {
       .style("stroke-width", 1.5 / k + "px");
 }
 
+var likes = [];
+var likes_dict = {};
+var maxLikes = 0;
+
 d3.json("cityphotos.json", function(json) {
   var g = map.selectAll("g").data(json.cities)
               .enter().append("g");
-  g.forEach(function(d) {
-    d.forEach(function(obj) {
-      console.log(obj);
-    });
-  });
+
   json.cities.forEach(function(city) {
     cities.push(city);
+    var likeCount = 0;
+    var y0 = 0;
+    var individualLikes = [];
+    city.media.forEach(function (media) {
+      individualLikes.push({y0: y0, y1: y0 += media.likes, image: media.image_thumb});
+      likeCount += media.likes;
+    });
+    var name = city.name;
+    maxLikes = Math.max(maxLikes, likeCount);
+    var dict = {'name':city.name, 'likes':likeCount, 'location':city.location, 'individualLikes':individualLikes};
+    likes.push(dict);
+    likes_dict[city.name] = likeCount;
   });
-  console.log(cities);
+
   var cityCount = 0;
-  g.selectAll("rect").data(function(d, i) { d.location.i = i; return d.location; })
-      .enter().append("rect")
-        .attr("x", function(d, i) {
+  g.selectAll("circle").data(function(d, i) { d.location.i = i; return d.location; })
+      .enter().append("circle")
+        .attr("cx", function(d, i) {
                       d.i = cityCount;
                       cityCount++;
                       var coords = projection([d.lng, d.lat]);
-                      console.log(coords[0])
-                       return coords[0];
+                      return coords[0];
                     })
-        .attr("y", function(d) {
+        .attr("cy", function(d) {
                       var coords = projection([d.lng, d.lat]);
-                      console.log(coords[0])
                       return coords[1];
                     })
-        .attr("width", 4)
-        .attr("height", 4)
+        .attr("r", city_like_size)
         .style("fill", "green")
         .on("mouseover", citymouseover)
-        .on("mouseout", mouseout);
+        .on("mouseout", citymouseout);
 
   // g.selectAll("circle").data(function(d) { return d.media; })
   //     .enter().append("circle")
@@ -129,103 +138,43 @@ d3.json("cityphotos.json", function(json) {
   //       .on("mouseover", mouseover)
   //       .on("mouseout", mouseout);
 
-  function mouseover(d) {
-    var projection = d3.geo.albers()
-    var coords = projection([d.location.lng, d.location.lat]);
-    console.log(coords);
-    mapsvg.append("image")
-        .attr("xlink:href", d.image_thumb)
-        .attr("width", 50)
-        .attr("height", 50)
-        .attr("x", coords[0])
-        .attr("y", coords[1]);
-  }
-
-  function mouseout (d) {
-    mapsvg.select("image").remove();
-  }
-
-
   function citymouseout(d) {
-    var city = cities[d.i];
-    city.media.forEach(function(media) {
-      mapsvg.select("image").remove();
-    })
-
+    mapsvg.selectAll("image").remove();
   }
 
-   function citymouseover (d) {
-    console.log(d);
-    console.log(d.i);
+  function citymouseover (d) {
     var city = cities[d.i];
-    console.log(city);
-
     var media_count = city.media.length;
-    console.log(media_count);
     var offset_angle = (2*Math.PI)/media_count;
-    console.log(offset_angle);
     var counter = 0;
 
     function position(city, media, counter) {
-        var length = 8;
+        var length = 150;
         var projection = d3.geo.albers();
         var city_coord = projection([city.location[0].lng, city.location[0].lat]); 
-        console.log("city: "+city_coord);
-        console.log("city: " + city.name);
-     
-        console.log("offset_angle" + offset_angle);
         var x = length * Math.sin(offset_angle*counter);
         var y = length * Math.cos(offset_angle*counter);
-        console.log(counter);
         var coords = [city_coord[0] + x, city_coord[1] + y];
-        console.log(coords);
         return coords;
     }
-    console.log(city.media.length);
 
     city.media.forEach(function(media) {
       counter += 1;
       var coords = position(city, media, counter);
-      console.log(media);
-      console.log(coords);
-     
-
-      // mapsvg.append("image")
-      //   .attr("xlink:href", media.image_thumb)
-      //   .attr("width", 50)
-      //   .attr("height", 50)
-      //   .attr("x", coords[0])
-      //   .attr("y", coords[1]);
-
-//here coords should be updated for the new circle. verify in line 208 that coords is correct. 
-      mapsvg
-        .append("circle")
-        .attr("cx", coords[0]+counter)
-        .attr("cy", coords[1]+counter)
-        .attr("r", 1)
-        .style("fill", "green");
-
-      console.log("coordinates of projected image: " + coords);
-      console.log(mapsvg.selectAll("circle"));
+      mapsvg.append("image")
+        .attr("xlink:href", media.image_thumb)
+        .attr("width", 40)
+        .attr("height", 40)
+        .attr("x", coords[0])
+        .attr("y", coords[1]); 
     })
   }
 
-  var likes = [];
-  var maxLikes = 0;
-  json.cities.forEach(function (city) {
-    var likeCount = 0;
-    var y0 = 0;
-    var individualLikes = [];
-    city.media.forEach(function (media) {
-      individualLikes.push({y0: y0, y1: y0 += media.likes, image: media.image_thumb});
-      likeCount += media.likes;
-    });
-    var name = city.name;
-    maxLikes = Math.max(maxLikes, likeCount);
-    var dict = {'name':city.name, 'likes':likeCount, 'location':city.location, 'individualLikes':individualLikes};
-    likes.push(dict);
-  });
-
+  function city_like_size(d) {
+    var city = cities[d.i];
+    var num_likes = likes_dict[city.name]
+    return num_likes/10
+  }
   // sort by increasing longitude
   likes.sort(function (a, b) {
     var lngA = a.location[0].lng;
@@ -233,15 +182,15 @@ d3.json("cityphotos.json", function(json) {
     return lngA < lngB ? -1 : lngA > lngB ? 1 : 0;
   });
 
-  var color = d3.scale.category20();
+var color = d3.scale.category20();
   var indices = new Array(25);
   for (var i = 0; i < 25; i++) {
     indices[i] = i;
   };
- 
+  color.domain(indices);
 
   x.domain(likes.map(function(d) { return d.name; }));
-  //console.log(y.domain([0, d3.max(likes, function(d) { return d.likes; })]));
+  console.log(y.domain([0, d3.max(likes, function(d) { return d.likes; })]));
 
   var city = chart.selectAll(".city")
                     .data(likes)
@@ -249,7 +198,6 @@ d3.json("cityphotos.json", function(json) {
                     .attr("class", "g")
                     .attr("transform", function(d) { return "translate(" + x(d.name) + ",0)"; })
                     .attr("fill", "Clear");
-
 
   chart.append("g")
         .attr("class", "x axis")
