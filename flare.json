@@ -1,0 +1,36 @@
+{"cities":
+  [
+    {
+     "name": "San Francisco",
+     "size": 6000,
+     "children": [
+       {
+         "name": "1",
+         "size": 5000
+         },
+         {
+          "name": "2",
+          "size": 3000
+        }
+      ]
+    },
+    {
+     "name": "Los Angeles",
+     "size": 6000,
+     "children": [
+       {
+         "name": "1",
+         "size": 5000
+       },
+       {
+          "name": "2",
+          "size": 3000
+        },
+        {
+          "name": "3",
+          "size": 6000
+        }
+      ]
+    }
+  ]
+}

@@ -71,7 +71,11 @@ function update() {
 
   // Update node
   node = vis.selectAll("circle.node")
-      .data(nodes, function(d) { return d.id; })
+      .data(nodes, function(d, i) { 
+        console.log(d.name);
+        d.x =  i * 5 + 50;
+        d.y = i * 5 + 50;
+        return d.name; })
       .style("fill", color);
 
   // Enter any new nodes.
@@ -102,7 +106,7 @@ function color(d) {
 
 // Toggle children on click.
 function click_expand(d) {
-  if (d.children) {
+  if (d.children) { 
     d._children = d.children;
     d.children = null;
   } else {
@@ -115,22 +119,20 @@ function click_expand(d) {
 // dont want to recurse since we only have 1 layer. 
 function flatten(root) {
   var nodes = [], i = 0;
-  console.log(root);
-  console.log(root.children);
-
   if (root.length > 0) {
-      console.log("true");
       root.forEach(function(node) {
-        node.children.forEach(function(child) {
-        console.log(child);
-          if (!child.id) child.id = ++i;
-          nodes.push(child);  
-        });
+        if (node.children != null) {
+          node.children.forEach(function(child) {
+            if (!child.id) child.id = ++i;
+            nodes.push(child);  
+          });
+      };
+      nodes.push(node);
       });
   }
 
   //if (!root.id) root.id = ++i;
-  nodes.push(root);  
+
 
   // function recurse(node) {
   //   if (node.children) node.children.forEach(recurse);
