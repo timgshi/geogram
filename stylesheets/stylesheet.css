@@ -379,7 +379,8 @@ Full-Width Styles
 }
 
 #main_content {
-  padding-top: 144px;
+  padding-top: 40px;
+  padding-left:144px;
 }
 
  #legend {
